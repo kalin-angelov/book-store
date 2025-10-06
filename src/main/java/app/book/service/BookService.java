@@ -4,6 +4,7 @@ import app.author.model.Author;
 import app.author.repository.AuthorRepository;
 import app.book.model.Book;
 import app.book.repository.BookRepository;
+import app.exeptions.BookException;
 import app.web.dto.AddBookRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +40,7 @@ public class BookService {
     }
 
     public Book getBook(UUID bookId) {
-        return bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException("Book not found"));
+        return bookRepository.findById(bookId).orElseThrow(() -> new BookException("Book not found"));
     }
 
     private Book initializeBook(AddBookRequest newBookRequest) {
