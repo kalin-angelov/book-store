@@ -3,13 +3,13 @@ package app.author.service;
 import app.author.model.Author;
 import app.author.repository.AuthorRepository;
 import app.book.model.Book;
+import app.exeptions.AuthorException;
 import app.web.dto.AddAuthorRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -27,7 +27,7 @@ public class AuthorService {
     }
 
     public Author getAuthor(UUID authorId) {
-        return authorRepository.findById(authorId).orElseThrow(() -> new RuntimeException("Author not found."));
+        return authorRepository.findById(authorId).orElseThrow(() -> new AuthorException("Author not found."));
     }
 
     public List<Author> getAllAuthors() {
