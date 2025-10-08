@@ -1,11 +1,14 @@
 package app.user.model;
 
+import app.order.model.Order;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -32,5 +35,8 @@ public class User {
     private String password;
 
     private String address;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "owner")
+    private List<Order> orders = new ArrayList<>();
 
 }
