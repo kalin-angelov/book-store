@@ -5,5 +5,5 @@ public class UserException extends RuntimeException {
     super(message);
   }
 
-  public UserException () {}
+  public UserException() {}
 }
