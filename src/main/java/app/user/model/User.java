@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -26,7 +27,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     private String name;
@@ -35,6 +36,15 @@ public class User {
     private String password;
 
     private String address;
+
+    @Column(nullable = false)
+    private boolean isActive;
+
+    @Column(nullable = false)
+    private LocalDateTime registerOn;
+
+    @Column(nullable = false)
+    private LocalDateTime updatedOn;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "owner")
     private List<Order> orders = new ArrayList<>();
