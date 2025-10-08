@@ -13,6 +13,7 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "orders")
 public class Order {
 
     @Id
@@ -25,9 +26,8 @@ public class Order {
     @Column(nullable = false)
     private String address;
 
-    private Book product;
-
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
     @Column(nullable = false)
