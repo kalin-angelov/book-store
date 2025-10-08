@@ -1,6 +1,7 @@
 package app.web;
 
 import app.user.service.UserService;
+import app.web.dto.LoginRequest;
 import app.web.dto.RegisterRequest;
 import app.web.dto.Response;
 import lombok.RequiredArgsConstructor;
@@ -29,5 +30,17 @@ public class AuthController {
                         .message("User successfully register")
                         .build());
 
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<Response> loginUser(@RequestBody LoginRequest loginRequest) {
+
+        userService.verify(loginRequest);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(Response.builder()
+                        .message("Welcome")
+                        .build());
     }
 }
