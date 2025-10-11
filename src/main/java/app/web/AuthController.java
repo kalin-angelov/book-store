@@ -22,12 +22,12 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<Response> registerUser(@RequestBody RegisterRequest request) {
 
-        userService.registerUser(request);
+        String token = userService.registerUser(request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(Response.builder()
-                        .message("User successfully register")
+                        .message("User successfully register - [%s]".formatted(token))
                         .build());
 
     }
