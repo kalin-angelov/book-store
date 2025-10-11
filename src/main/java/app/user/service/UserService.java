@@ -3,6 +3,7 @@ package app.user.service;
 import app.exeptions.EmailAlreadyExistInExceptionDB;
 import app.exeptions.PasswordException;
 import app.exeptions.UserException;
+import app.jwt.JwtService;
 import app.user.model.User;
 import app.user.model.UserRole;
 import app.user.repository.UserRepository;
@@ -25,9 +26,10 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     @Transactional
-    public void registerUser(RegisterRequest request) {
+    public String registerUser(RegisterRequest request) {
 
         if (!request.getPassword().equals(request.getConfigPassword())) {
             log.info("Password's don't match");
@@ -42,8 +44,10 @@ public class UserService {
         }
 
         User user = initializeUser(request);
+        String token = jwtService.generateToken(user.getEmail());
         userRepository.save(user);
         log.info("User successfully added in DB");
+        return token;
     }
 
     public void verify(LoginRequest loginRequest) {
