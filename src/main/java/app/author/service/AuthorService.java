@@ -20,6 +20,9 @@ public class AuthorService {
     private final AuthorRepository authorRepository;
 
     public Author addAuthor(AddAuthorRequest request) {
+
+        authorRepository.findAuthorByName(request.getName()).orElseThrow(() -> new AuthorException("This author [%s] is already in the DB".formatted(request.getName())));
+
         Author author = initializeAuthor(request);
         authorRepository.save(author);
         log.info("Author [%s] successfully added in DB".formatted(author.getName()));
