@@ -35,12 +35,12 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<Response> loginUser(@RequestBody LoginRequest loginRequest) {
 
-        userService.verify(loginRequest);
+        String token = userService.verify(loginRequest);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(Response.builder()
-                        .message("Welcome")
+                        .message("Welcome - [%s]".formatted(token))
                         .build());
     }
 }
