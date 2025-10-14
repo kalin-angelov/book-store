@@ -4,6 +4,7 @@ import app.exeptions.EmailAlreadyExistInExceptionDB;
 import app.exeptions.PasswordException;
 import app.exeptions.UserException;
 import app.jwt.JwtService;
+import app.token.service.TokenService;
 import app.user.model.User;
 import app.user.model.UserRole;
 import app.user.repository.UserRepository;
@@ -11,6 +12,8 @@ import app.web.dto.LoginRequest;
 import app.web.dto.RegisterRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,7 +29,9 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TokenService tokenService;
     private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
 
     @Transactional
     public String registerUser(RegisterRequest request) {
@@ -46,15 +51,22 @@ public class UserService {
         User user = initializeUser(request);
         String token = jwtService.generateToken(user.getEmail());
         userRepository.save(user);
+        tokenService.initializeToken(user, token);
         log.info("User successfully added in DB");
         return token;
     }
 
-    public void verify(LoginRequest loginRequest) {
+    public String verify(LoginRequest loginRequest) {
 
         try {
-            userRepository.findUserByEmail(loginRequest.getEmail())
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+            User user = userRepository.findUserByEmail(loginRequest.getEmail())
                     .orElseThrow(() -> new UsernameNotFoundException("User with the provided email [%s] is found.".formatted(loginRequest.getEmail())));
+            String token = jwtService.generateToken(user.getEmail());
+
+            tokenService.revokedAllUserTokens(user);
+            tokenService.initializeToken(user, token);
+            return token;
 
         } catch (Exception exception) {
             log.info(exception.getMessage());
