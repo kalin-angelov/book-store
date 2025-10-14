@@ -2,6 +2,7 @@ package app.order.model;
 
 import app.book.model.Book;
 import app.user.model.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,6 +22,8 @@ public class Order {
     private UUID id;
 
     @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "user_id")
     private User owner;
 
     @Column(nullable = false)

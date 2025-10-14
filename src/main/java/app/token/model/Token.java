@@ -1,6 +1,7 @@
 package app.token.model;
 
 import app.user.model.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,6 +31,7 @@ public class Token {
     private boolean expired;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "user_id")
     private User owner;
 }
