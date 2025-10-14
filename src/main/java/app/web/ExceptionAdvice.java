@@ -44,7 +44,7 @@ public class ExceptionAdvice {
     @ExceptionHandler(AuthorException.class)
     public ResponseEntity<ErrorResponse> handleAuthorException(AuthorException exception) {
 
-        ErrorResponse response = new ErrorResponse(HttpStatus.NOT_FOUND.value(), exception.getMessage());
+        ErrorResponse response = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), exception.getMessage());
 
         return ResponseEntity
                 .status(response.getStatus())
@@ -52,7 +52,7 @@ public class ExceptionAdvice {
     }
 
     @ExceptionHandler(UserException.class)
-    public ResponseEntity<ErrorResponse> handleUserException(AuthorException exception) {
+    public ResponseEntity<ErrorResponse> handleUserException(UserException exception) {
 
         ErrorResponse response = new ErrorResponse(HttpStatus.NOT_FOUND.value(), exception.getMessage());
 
