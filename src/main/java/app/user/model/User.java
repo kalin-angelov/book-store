@@ -1,6 +1,7 @@
 package app.user.model;
 
 import app.order.model.Order;
+import app.token.model.Token;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,7 +47,10 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime updatedOn;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "owner")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "owner")
     private List<Order> orders = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "owner")
+    private List<Token> tokens;
 
 }
