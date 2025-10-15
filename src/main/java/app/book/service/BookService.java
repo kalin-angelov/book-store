@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,16 +26,10 @@ public class BookService {
     public Book addNewBook(AddBookRequest request) {
 
         Book book = initializeBook(request);
-        bookRepository.save(book);
-
-        Optional<Author> optionalAuthor = authorRepository.findAuthorByName(request.getAuthorName());
-        if (optionalAuthor.isPresent()) {
-            Author author = optionalAuthor.get();
-            List<Book> authorBooks = author.getBooks();
-            authorBooks.add(book);
-            author.setBooks(authorBooks);
-            authorRepository.save(author);
+        if(request.getAuthorName() != null) {
+            addAuthor(book, request.getAuthorName());
         }
+        bookRepository.save(book);
         log.info("Book [%s] successfully added in DB".formatted(book.getTitle()));
         return book;
     }
@@ -51,11 +46,25 @@ public class BookService {
                 .type(newBookRequest.getType())
                 .pages(newBookRequest.getPages())
                 .numOfBooksInStoke(newBookRequest.getNumOfBooks())
+                .addedOn(LocalDateTime.now())
                 .InStoke(true)
                 .price(newBookRequest.getPrice())
                 .language(newBookRequest.getLanguage())
-                .authorName(newBookRequest.getAuthorName())
                 .build();
     }
 
+    private void addAuthor(Book book, String authorName) {
+        Optional<Author> optionalAuthor = authorRepository.findAuthorByName(authorName);
+        if (optionalAuthor.isPresent()) {
+            book.setAuthor(optionalAuthor.get());
+            book.setAuthorName(authorName);
+        } else {
+            book.setAuthorName(authorName);
+        }
+    }
+
+    public List<Book> getLatestAddedBooks() {
+
+        return bookRepository.findLatestAddedBooks();
+    }
 }
