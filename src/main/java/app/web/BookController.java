@@ -9,11 +9,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/books")
+@RequestMapping("/api/v1/book")
 public class BookController {
 
     private final BookService bookService;
@@ -34,5 +35,11 @@ public class BookController {
     public Book getBookDetails(@RequestParam(name = "bookId") UUID bookId) {
 
         return bookService.getBook(bookId);
+    }
+
+    @GetMapping("/latest-books")
+    public List<Book> latestAddedBooks() {
+
+        return bookService.getLatestAddedBooks();
     }
 }
