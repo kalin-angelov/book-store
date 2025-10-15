@@ -32,6 +32,6 @@ public class Author {
     @Column(length = 1000)
     private String authorPic;
 
-    @OneToMany
+    @OneToMany(mappedBy = "author")
     private List<Book> books = new ArrayList<>();
 }
