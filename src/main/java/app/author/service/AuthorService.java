@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -21,7 +22,9 @@ public class AuthorService {
 
     public Author addAuthor(AddAuthorRequest request) {
 
-        authorRepository.findAuthorByName(request.getName()).orElseThrow(() -> new AuthorException("This author [%s] is already in the DB".formatted(request.getName())));
+        Optional<Author> optionalExistingAuthor = authorRepository.findAuthorByName(request.getName());
+
+        if (optionalExistingAuthor.isPresent()) throw new AuthorException("This author [%s] is already in the DB".formatted(request.getName()));
 
         Author author = initializeAuthor(request);
         authorRepository.save(author);
