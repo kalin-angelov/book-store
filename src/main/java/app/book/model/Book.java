@@ -1,5 +1,7 @@
 package app.book.model;
 
+import app.author.model.Author;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -44,11 +47,18 @@ public class Book {
     private boolean InStoke;
 
     @Column(nullable = false)
+    private LocalDateTime addedOn;
+
+    @Column(nullable = false)
     private BigDecimal price;
 
     @Column(nullable = false)
     private String language;
 
-    @Column(nullable = false)
     private String authorName;
+
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "author_id")
+    private Author author;
 }
