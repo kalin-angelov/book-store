@@ -4,6 +4,7 @@ import app.author.model.Author;
 import app.author.service.AuthorService;
 import app.book.model.Book;
 import app.web.dto.AddAuthorRequest;
+import app.web.dto.EditAuthorRequest;
 import app.web.dto.Response;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -46,5 +47,17 @@ public class AuthorController {
     public List<Book> getAllAuthorBooks(@RequestParam(name = "authorId") UUID authorId) {
 
         return authorService.getAllAuthorBooks(authorId);
+    }
+
+    @PostMapping("/edit-author")
+    public ResponseEntity<Response> editAuthor(@RequestParam(name = "authorId") UUID authorId, @RequestBody EditAuthorRequest request) {
+
+        Author author = authorService.editAuthor(authorId, request);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(Response.builder()
+                        .message("Author [%s] successfully edited".formatted(author.getName()))
+                        .build());
     }
 }
