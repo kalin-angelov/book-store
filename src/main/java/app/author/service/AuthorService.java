@@ -5,6 +5,7 @@ import app.author.repository.AuthorRepository;
 import app.book.model.Book;
 import app.exeptions.AuthorException;
 import app.web.dto.AddAuthorRequest;
+import app.web.dto.EditAuthorRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -50,5 +51,17 @@ public class AuthorService {
                 .name(newAuthorRequest.getName())
                 .bio(newAuthorRequest.getBio())
                 .build();
+    }
+
+    public Author editAuthor(UUID authorId, EditAuthorRequest request) {
+
+        Author author = authorRepository.findById(authorId).orElseThrow(() -> new AuthorException("Author with id [%s] not found in DB".formatted(authorId)));
+
+        if (request.getName() != null) author.setName(request.getName());
+        if (request.getBio() != null) author.setBio(request.getBio());
+        if (request.getAuthorPic() != null) author.setAuthorPic(request.getAuthorPic());
+
+        authorRepository.save(author);
+        return author;
     }
 }
