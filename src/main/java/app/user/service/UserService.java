@@ -8,6 +8,7 @@ import app.token.service.TokenService;
 import app.user.model.User;
 import app.user.model.UserRole;
 import app.user.repository.UserRepository;
+import app.web.dto.EditUserRequest;
 import app.web.dto.LoginRequest;
 import app.web.dto.RegisterRequest;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -76,6 +78,17 @@ public class UserService {
 
     }
 
+    private User getUserById(UUID userId) {
+
+        Optional<User> optionalUser = userRepository.findById(userId);
+
+        if (optionalUser.isEmpty()) {
+            log.info("User with id-[%s] not found in DB".formatted(userId));
+            throw new UserException("User not found in DB");
+        }
+
+        return optionalUser.get();
+    }
     private User initializeUser(RegisterRequest request) {
 
         return User.builder()
@@ -86,5 +99,19 @@ public class UserService {
                 .registerOn(LocalDateTime.now())
                 .updatedOn(LocalDateTime.now())
                 .build();
+    }
+
+    public User editUser(UUID userId, EditUserRequest request) {
+
+        User user = getUserById(userId);
+
+        if (request.getEmail() != null) user.setEmail(request.getEmail());
+        if (request.getName() != null) user.setName(request.getName());
+        if (request.getAddress() != null) user.setAddress(request.getAddress());
+
+        user.setUpdatedOn(LocalDateTime.now());
+        userRepository.save(user);
+        log.info("User with id-[%s] successfully edited".formatted(userId));
+        return user;
     }
 }
