@@ -35,7 +35,7 @@ public class AuthorController {
 
     @GetMapping("/bio")
     public Author getAuthor(@RequestParam(name = "authorId")UUID authorId) {
-        return authorService.getAuthor(authorId);
+        return authorService.getAuthorById(authorId);
     }
 
     @GetMapping
@@ -49,7 +49,7 @@ public class AuthorController {
         return authorService.getAllAuthorBooks(authorId);
     }
 
-    @PostMapping("/edit-author")
+    @PutMapping("/edit-author")
     public ResponseEntity<Response> editAuthor(@RequestParam(name = "authorId") UUID authorId, @RequestBody EditAuthorRequest request) {
 
         Author author = authorService.editAuthor(authorId, request);
