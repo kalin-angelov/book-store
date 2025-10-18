@@ -1,6 +1,5 @@
 package app.jwt;
 
-import app.user.model.UserRole;
 import io.github.cdimascio.dotenv.Dotenv;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
