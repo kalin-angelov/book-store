@@ -18,14 +18,16 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class AuthorService {
-
     private final AuthorRepository authorRepository;
 
     public Author addAuthor(AddAuthorRequest request) {
 
         Optional<Author> optionalExistingAuthor = authorRepository.findAuthorByName(request.getName());
 
-        if (optionalExistingAuthor.isPresent()) throw new AuthorException("This author [%s] is already in the DB".formatted(request.getName()));
+        if (optionalExistingAuthor.isPresent()) {
+            log.info("Author with name-[%s] is already in DB".formatted(request.getName()));
+            throw new AuthorException("This author [%s] is already in the DB".formatted(request.getName()));
+        }
 
         Author author = initializeAuthor(request);
         authorRepository.save(author);
@@ -33,8 +35,16 @@ public class AuthorService {
         return author;
     }
 
-    public Author getAuthor(UUID authorId) {
-        return authorRepository.findById(authorId).orElseThrow(() -> new AuthorException("Author not found."));
+    public Author getAuthorById(UUID authorId) {
+
+        Optional<Author> optionalAuthor = authorRepository.findById(authorId);
+
+        if (optionalAuthor.isEmpty()) {
+            log.info("Author with id-[%s] not found in DB".formatted(authorId));
+            throw new AuthorException("Author not found in DB");
+        }
+
+        return optionalAuthor.get();
     }
 
     public List<Author> getAllAuthors() {
@@ -42,7 +52,7 @@ public class AuthorService {
     }
 
     public List<Book> getAllAuthorBooks(UUID authorId) {
-        Author author = getAuthor(authorId);
+        Author author = getAuthorById(authorId);
         return author.getBooks();
     }
 
@@ -55,13 +65,14 @@ public class AuthorService {
 
     public Author editAuthor(UUID authorId, EditAuthorRequest request) {
 
-        Author author = authorRepository.findById(authorId).orElseThrow(() -> new AuthorException("Author with id [%s] not found in DB".formatted(authorId)));
+        Author author = getAuthorById(authorId);
 
         if (request.getName() != null) author.setName(request.getName());
         if (request.getBio() != null) author.setBio(request.getBio());
         if (request.getAuthorPic() != null) author.setAuthorPic(request.getAuthorPic());
 
         authorRepository.save(author);
+        log.info("Author with id-[%s] successfully edited".formatted(authorId));
         return author;
     }
 }
