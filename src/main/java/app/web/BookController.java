@@ -3,6 +3,7 @@ package app.web;
 import app.book.model.Book;
 import app.book.service.BookService;
 import app.web.dto.AddBookRequest;
+import app.web.dto.EditBookRequest;
 import app.web.dto.Response;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,10 +32,18 @@ public class BookController {
                         .build());
     }
 
+    @PutMapping("/edit-book")
+    public Book editBook(@RequestParam(name = "bookId")UUID bookId, @RequestBody EditBookRequest request) {
+
+        Book book = bookService.editBook(bookId, request);
+
+        return book;
+    }
+
     @GetMapping
     public Book getBookDetails(@RequestParam(name = "bookId") UUID bookId) {
 
-        return bookService.getBook(bookId);
+        return bookService.getBookById(bookId);
     }
 
     @GetMapping("/latest-books")
