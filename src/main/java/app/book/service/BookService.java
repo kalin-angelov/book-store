@@ -6,6 +6,7 @@ import app.book.model.Book;
 import app.book.repository.BookRepository;
 import app.exeptions.BookException;
 import app.web.dto.AddBookRequest;
+import app.web.dto.EditBookRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -34,8 +35,16 @@ public class BookService {
         return book;
     }
 
-    public Book getBook(UUID bookId) {
-        return bookRepository.findById(bookId).orElseThrow(() -> new BookException("Book not found"));
+    public Book getBookById(UUID bookId) {
+
+        Optional<Book> optionalBook = bookRepository.findById(bookId);
+
+        if (optionalBook.isEmpty()) {
+            log.info("Book with id-[%s] not found in DB".formatted(bookId));
+            throw  new BookException("Book not found in DB");
+        }
+
+        return optionalBook.get();
     }
 
     private Book initializeBook(AddBookRequest newBookRequest) {
@@ -66,5 +75,25 @@ public class BookService {
     public List<Book> getLatestAddedBooks() {
 
         return bookRepository.findLatestAddedBooks();
+    }
+
+    public Book editBook(UUID bookId, EditBookRequest request) {
+
+        Book book = getBookById(bookId);
+
+        if (request.getTitle() != null) book.setTitle(request.getTitle());
+        if (request.getBookCover() != null) book.setBookCover(request.getBookCover());
+        if (request.getGenre() != null) book.setGenre(request.getGenre());
+        if (request.getType() != null) book.setType(request.getType());
+        if (request.getPages() != book.getPages()) book.setPages(request.getPages());
+        if (request.getNumOfBooks() != book.getNumOfBooksInStoke()) book.setNumOfBooksInStoke(request.getNumOfBooks());
+        if (request.isInStoke() != book.isInStoke()) book.setInStoke(request.isInStoke());
+        if (request.getPrice() != null) book.setPrice(request.getPrice());
+        if (request.getLanguage() != null) book.setLanguage(request.getLanguage());
+        if (request.getAuthorName() != null) book.setAuthorName(request.getAuthorName());
+
+        bookRepository.save(book);
+        log.info("Book with id [%s] successfully edited".formatted(bookId));
+        return book;
     }
 }
