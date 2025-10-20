@@ -8,6 +8,7 @@ import app.token.service.TokenService;
 import app.user.model.User;
 import app.user.model.UserRole;
 import app.user.repository.UserRepository;
+import app.web.dto.ChangePasswordRequest;
 import app.web.dto.EditUserRequest;
 import app.web.dto.LoginRequest;
 import app.web.dto.RegisterRequest;
@@ -38,7 +39,7 @@ public class UserService {
     @Transactional
     public String registerUser(RegisterRequest request) {
 
-        if (!request.getPassword().equals(request.getConfigPassword())) {
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
             log.info("Password's don't match");
             throw new PasswordException("Password's don't match");
         }
@@ -113,5 +114,23 @@ public class UserService {
         userRepository.save(user);
         log.info("User with id-[%s] successfully edited".formatted(userId));
         return user;
+    }
+
+    public void editPassword(UUID userId, ChangePasswordRequest request) {
+
+        User user = getUserById(userId);
+
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            log.info("Incorrect password!");
+            throw new PasswordException("Incorrect password!");
+        }
+
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            log.info("Passwords don't match");
+            throw new PasswordException("Passwords don't match");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
     }
 }
