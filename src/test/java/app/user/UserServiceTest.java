@@ -9,6 +9,8 @@ import app.user.model.User;
 import app.user.model.UserRole;
 import app.user.repository.UserRepository;
 import app.user.service.UserService;
+import app.web.dto.ChangePasswordRequest;
+import app.web.dto.EditUserRequest;
 import app.web.dto.LoginRequest;
 import app.web.dto.RegisterRequest;
 import org.junit.jupiter.api.Test;
@@ -21,7 +23,9 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import static app.TestBuilder.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -41,13 +45,14 @@ public class UserServiceTest {
     private TokenService tokenService;
 
     @Mock
-    private PasswordEncoder passwordEncoder;
+    private AuthenticationManager authenticationManager;
 
     @Mock
-    private AuthenticationManager authenticationManager;
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private UserService userService;
+
 
     @Test
     void givenExistingEmail_whenRegisterUser_exceptionIsThrown() {
@@ -129,4 +134,187 @@ public class UserServiceTest {
         verify(tokenService, times(1)).initializeToken(user, token);
     }
 
+    @Test
+    void givenInvalidUserId_whenEditUser_thenExceptionIsThrown() {
+
+        UUID userId = UUID.randomUUID();
+        EditUserRequest request = EditUserRequest.builder().build();
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThrows(UserException.class, () -> userService.editUser(userId,request));
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void givenOnlyEmailForChanging_whenEditUser_thenOnlyTheEmailIsChanged() {
+
+        User user = aRandomExistingUser();
+        LocalDateTime oldTimeStamp = user.getUpdatedOn();
+        EditUserRequest request = EditUserRequest
+                .builder()
+                .email("newEmail@gmail.com")
+                .name(null)
+                .address(null)
+                .build();
+
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        userService.editUser(user.getId(), request);
+
+        assertEquals("newEmail@gmail.com", user.getEmail());
+        assertEquals("testName", user.getName());
+        assertEquals("testAddress", user.getAddress());
+        assertThat(user.getUpdatedOn().isAfter(oldTimeStamp));
+        verify(userRepository, times(1)).save(user);
+    }
+
+    @Test
+    void givenOnlyNameForChanging_whenEditUser_thenOnlyTheNameIsChanged() {
+
+        User user = aRandomExistingUser();
+        LocalDateTime oldTimeStamp = user.getUpdatedOn();
+        EditUserRequest request = EditUserRequest
+                .builder()
+                .email(null)
+                .name("newName")
+                .address(null)
+                .build();
+
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        userService.editUser(user.getId(), request);
+
+        assertEquals("UserTestEmail@gmail.com", user.getEmail());
+        assertEquals("newName", user.getName());
+        assertEquals("testAddress", user.getAddress());
+        assertThat(user.getUpdatedOn().isAfter(oldTimeStamp));
+        verify(userRepository, times(1)).save(user);
+    }
+
+    @Test
+    void givenOnlyAddressForChanging_whenEditUser_thenOnlyTheAddressIsChanged() {
+
+        User user = aRandomExistingUser();
+        LocalDateTime oldTimeStamp = user.getUpdatedOn();
+        EditUserRequest request = EditUserRequest
+                .builder()
+                .email(null)
+                .name(null)
+                .address("newAddress")
+                .build();
+
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        userService.editUser(user.getId(), request);
+
+        assertEquals("UserTestEmail@gmail.com", user.getEmail());
+        assertEquals("testName", user.getName());
+        assertEquals("newAddress", user.getAddress());
+        assertThat(user.getUpdatedOn().isAfter(oldTimeStamp));
+        verify(userRepository, times(1)).save(user);
+    }
+
+    @Test
+    void givenOnlyEmailAndAddressForEdit_whenEditUser_thenOnlyTheGivenFieldsAreChanged() {
+
+        User user = aRandomExistingUser();
+        LocalDateTime oldTimeStamp = user.getUpdatedOn();
+        EditUserRequest request = EditUserRequest
+                .builder()
+                .email("newEmail@gmail.com")
+                .name(null)
+                .address("newAddress")
+                .build();
+
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        userService.editUser(user.getId(), request);
+
+        assertEquals("newEmail@gmail.com", user.getEmail());
+        assertEquals("testName", user.getName());
+        assertEquals("newAddress", user.getAddress());
+        assertThat(user.getUpdatedOn().isAfter(oldTimeStamp));
+        verify(userRepository, times(1)).save(user);
+    }
+
+    @Test
+    void givenOnlyNameAndAddressForEdit_whenEditUser_thenOnlyTheGivenFieldsAreChanged() {
+
+        User user = aRandomExistingUser();
+        LocalDateTime oldTimeStamp = user.getUpdatedOn();
+        EditUserRequest request = EditUserRequest
+                .builder()
+                .email(null)
+                .name("newName")
+                .address("newAddress")
+                .build();
+
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        userService.editUser(user.getId(), request);
+
+        assertEquals("UserTestEmail@gmail.com", user.getEmail());
+        assertEquals("newName", user.getName());
+        assertEquals("newAddress", user.getAddress());
+        assertThat(user.getUpdatedOn().isAfter(oldTimeStamp));
+        verify(userRepository, times(1)).save(user);
+    }
+
+    @Test
+    void givenOnlyNameAndEmailForEdit_whenEditUser_thenOnlyTheGivenFieldsAreChanged() {
+
+        User user = aRandomExistingUser();
+        LocalDateTime oldTimeStamp = user.getUpdatedOn();
+        EditUserRequest request = EditUserRequest
+                .builder()
+                .email("newEmail@gmail.com")
+                .name("newName")
+                .address(null)
+                .build();
+
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        userService.editUser(user.getId(), request);
+
+        assertEquals("newEmail@gmail.com", user.getEmail());
+        assertEquals("newName", user.getName());
+        assertEquals("testAddress", user.getAddress());
+        assertThat(user.getUpdatedOn().isAfter(oldTimeStamp));
+        verify(userRepository, times(1)).save(user);
+    }
+
+    @Test
+    void givenUnCorrectPassword_whenEditPassword_thenExceptionIsThrown() {
+
+        User user = aRandomExistingUser();
+        ChangePasswordRequest request = ChangePasswordRequest
+                .builder()
+                .oldPassword("oldPassword")
+                .newPassword("newPassword")
+                .confirmPassword("newPassword")
+                .build();
+
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        assertThrows(PasswordException.class, () -> userService.editPassword(user.getId(), request));
+        verify(userRepository, never()).save(user);
+    }
+
+    @Test
+    void givenNotMatchedNewPasswordAndConfirmPassword_whenEditPassword_thenExceptionIsThrown() {
+
+        User user = aRandomExistingUser();
+        ChangePasswordRequest request = ChangePasswordRequest
+                .builder()
+                .oldPassword("testPassword")
+                .newPassword("newPassword")
+                .confirmPassword("password")
+                .build();
+
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        assertThrows(PasswordException.class, () -> userService.editPassword(user.getId(), request));
+        verify(userRepository, never()).save(user);
+    }
 }
