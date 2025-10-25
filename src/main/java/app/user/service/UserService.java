@@ -120,15 +120,17 @@ public class UserService {
 
         User user = getUserById(userId);
 
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            log.info("Passwords don't match");
+            throw new PasswordException("Passwords don't match");
+        }
+
         if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
             log.info("Incorrect password!");
             throw new PasswordException("Incorrect password!");
         }
 
-        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
-            log.info("Passwords don't match");
-            throw new PasswordException("Passwords don't match");
-        }
+
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
