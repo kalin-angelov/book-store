@@ -6,6 +6,7 @@ import app.book.model.Book;
 import app.web.dto.AddAuthorRequest;
 import app.web.dto.EditAuthorRequest;
 import app.web.dto.Response;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class AuthorController {
     private final AuthorService authorService;
 
     @PostMapping("/add-author")
-    public ResponseEntity<Response> addNewAuthor(@RequestBody AddAuthorRequest request) {
+    public ResponseEntity<Response> addNewAuthor(@Valid @RequestBody AddAuthorRequest request) {
 
         Author author = authorService.addAuthor(request);
 
