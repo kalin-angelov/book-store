@@ -39,7 +39,11 @@ public class UserService {
     @Transactional
     public String registerUser(RegisterRequest request) {
 
-        if (!request.getPassword().equals(request.getConfirmPassword())) {
+        if (request.getEmail() == null || request.getEmail().isEmpty()) {
+            throw new UserException("All fields are required");
+        }
+
+        if (!request.getPassword().equals(request.getConfirmPassword()) || request.getPassword().isEmpty()) {
             log.info("Password's don't match");
             throw new PasswordException("Password's don't match");
         }
