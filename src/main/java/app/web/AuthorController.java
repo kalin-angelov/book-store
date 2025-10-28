@@ -3,13 +3,15 @@ package app.web;
 import app.author.model.Author;
 import app.author.service.AuthorService;
 import app.book.model.Book;
-import app.web.dto.AddAuthorRequest;
-import app.web.dto.EditAuthorRequest;
+import app.web.dto.AuthorRequest;
 import app.web.dto.Response;
+import app.web.validation.OnCreate;
+import app.web.validation.OnUpdate;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,7 +25,7 @@ public class AuthorController {
     private final AuthorService authorService;
 
     @PostMapping("/add-author")
-    public ResponseEntity<Response> addNewAuthor(@Valid @RequestBody AddAuthorRequest request) {
+    public ResponseEntity<Response> addNewAuthor(@Validated(OnCreate.class) @RequestBody AuthorRequest request) {
 
         Author author = authorService.addAuthor(request);
 
@@ -34,8 +36,8 @@ public class AuthorController {
                         .build());
     }
 
-    @GetMapping("/bio")
-    public Author getAuthor(@RequestParam(name = "authorId")UUID authorId) {
+    @GetMapping("/{authorId}/bio")
+    public Author getAuthor(@PathVariable UUID authorId) {
         return authorService.getAuthorById(authorId);
     }
 
@@ -44,14 +46,14 @@ public class AuthorController {
         return authorService.getAllAuthors();
     }
 
-    @GetMapping("/author-books")
-    public List<Book> getAllAuthorBooks(@RequestParam(name = "authorId") UUID authorId) {
+    @GetMapping("/{authorId}/author-books")
+    public List<Book> getAllAuthorBooks(@PathVariable UUID authorId) {
 
         return authorService.getAllAuthorBooks(authorId);
     }
 
-    @PutMapping("/edit-author")
-    public ResponseEntity<Response> editAuthor(@RequestParam(name = "authorId") UUID authorId, @RequestBody EditAuthorRequest request) {
+    @PutMapping("/{authorId}/edit-author")
+    public ResponseEntity<Response> editAuthor(@PathVariable UUID authorId,@Validated(OnUpdate.class) @RequestBody AuthorRequest request) {
 
         Author author = authorService.editAuthor(authorId, request);
 
