@@ -4,8 +4,7 @@ import app.author.model.Author;
 import app.author.repository.AuthorRepository;
 import app.book.model.Book;
 import app.exeptions.AuthorException;
-import app.web.dto.AddAuthorRequest;
-import app.web.dto.EditAuthorRequest;
+import app.web.dto.AuthorRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,7 +19,7 @@ import java.util.UUID;
 public class AuthorService {
     private final AuthorRepository authorRepository;
 
-    public Author addAuthor(AddAuthorRequest request) {
+    public Author addAuthor(AuthorRequest request) {
 
         Optional<Author> optionalExistingAuthor = authorRepository.findAuthorByName(request.getName());
 
@@ -56,14 +55,14 @@ public class AuthorService {
         return author.getBooks();
     }
 
-    private Author initializeAuthor(AddAuthorRequest newAuthorRequest) {
+    private Author initializeAuthor(AuthorRequest newAuthorRequest) {
         return Author.builder()
                 .name(newAuthorRequest.getName())
                 .bio(newAuthorRequest.getBio())
                 .build();
     }
 
-    public Author editAuthor(UUID authorId, EditAuthorRequest request) {
+    public Author editAuthor(UUID authorId, AuthorRequest request) {
 
         Author author = getAuthorById(authorId);
 

@@ -5,8 +5,7 @@ import app.author.repository.AuthorRepository;
 import app.book.model.Book;
 import app.book.repository.BookRepository;
 import app.exeptions.BookException;
-import app.web.dto.AddBookRequest;
-import app.web.dto.EditBookRequest;
+import app.web.dto.BookRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,7 +23,7 @@ public class BookService {
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
 
-    public Book addNewBook(AddBookRequest request) {
+    public Book addNewBook(BookRequest request) {
 
         Book book = initializeBook(request);
         if(request.getAuthorName() != null) {
@@ -47,7 +46,7 @@ public class BookService {
         return optionalBook.get();
     }
 
-    private Book initializeBook(AddBookRequest newBookRequest) {
+    private Book initializeBook(BookRequest newBookRequest) {
 
         return Book.builder()
                 .title(newBookRequest.getTitle())
@@ -56,7 +55,7 @@ public class BookService {
                 .pages(newBookRequest.getPages())
                 .numOfBooksInStoke(newBookRequest.getNumOfBooks())
                 .addedOn(LocalDateTime.now())
-                .InStoke(true)
+                .InStock(true)
                 .price(newBookRequest.getPrice())
                 .language(newBookRequest.getLanguage())
                 .build();
@@ -77,7 +76,7 @@ public class BookService {
         return bookRepository.findLatestAddedBooks();
     }
 
-    public Book editBook(UUID bookId, EditBookRequest request) {
+    public Book editBook(UUID bookId, BookRequest request) {
 
         Book book = getBookById(bookId);
 
@@ -87,7 +86,7 @@ public class BookService {
         if (request.getType() != null) book.setType(request.getType());
         if (request.getPages() != book.getPages()) book.setPages(request.getPages());
         if (request.getNumOfBooks() != book.getNumOfBooksInStoke()) book.setNumOfBooksInStoke(request.getNumOfBooks());
-        if (request.isInStoke() != book.isInStoke()) book.setInStoke(request.isInStoke());
+        if (request.isInStock() != book.isInStock()) book.setInStock(request.isInStock());
         if (request.getPrice() != null) book.setPrice(request.getPrice());
         if (request.getLanguage() != null) book.setLanguage(request.getLanguage());
         if (request.getAuthorName() != null) book.setAuthorName(request.getAuthorName());

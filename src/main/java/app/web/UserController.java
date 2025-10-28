@@ -5,6 +5,7 @@ import app.user.service.UserService;
 import app.web.dto.ChangePasswordRequest;
 import app.web.dto.EditUserRequest;
 import app.web.dto.Response;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,14 +20,14 @@ public class UserController {
 
     private final UserService userService;
 
-    @PutMapping("/edit-user")
-    public User editUser(@RequestParam(name = "userId")UUID userId, @RequestBody EditUserRequest request) {
+    @PutMapping("/{userId}/edit-user")
+    public User editUser(@PathVariable UUID userId,@Valid @RequestBody EditUserRequest request) {
 
         return userService.editUser(userId, request);
     }
 
-    @PutMapping("/edit-password")
-    public ResponseEntity<Response> changePassword(@RequestParam(name = "userId") UUID userId, @RequestBody ChangePasswordRequest request) {
+    @PutMapping("/{userId}/edit-password")
+    public ResponseEntity<Response> changePassword(@PathVariable UUID userId,@Valid @RequestBody ChangePasswordRequest request) {
 
         userService.editPassword(userId, request);
 
