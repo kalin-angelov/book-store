@@ -4,7 +4,7 @@ import app.author.model.Author;
 import app.author.repository.AuthorRepository;
 import app.author.service.AuthorService;
 import app.exeptions.AuthorException;
-import app.web.dto.AddAuthorRequest;
+import app.web.dto.AuthorRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -13,7 +13,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static app.TestBuilder.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,7 +34,7 @@ public class AuthorServiceTest {
                 .bio("authorBio")
                 .build();
 
-        AddAuthorRequest request = AddAuthorRequest.builder()
+        AuthorRequest request = AuthorRequest.builder()
                 .name("authorName")
                 .build();
 
