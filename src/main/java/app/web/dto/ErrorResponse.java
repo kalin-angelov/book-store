@@ -9,12 +9,12 @@ import java.time.format.DateTimeFormatter;
 public class ErrorResponse {
 
     private int status;
-    private String message;
+    private String error;
     private String timestamp;
 
-    public ErrorResponse(int status, String message) {
+    public ErrorResponse(int status, String error) {
         this.status = status;
-        this.message = message;
+        this.error = error;
         this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 }
