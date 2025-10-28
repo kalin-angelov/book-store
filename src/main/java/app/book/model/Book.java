@@ -44,7 +44,7 @@ public class Book {
     private int numOfBooksInStoke;
 
     @Column(nullable = false)
-    private boolean InStoke;
+    private boolean InStock;
 
     @Column(nullable = false)
     private LocalDateTime addedOn;
