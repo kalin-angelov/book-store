@@ -2,6 +2,8 @@ package app.web.dto;
 
 import app.book.model.BookGenre;
 import app.book.model.BookType;
+import app.web.validation.OnCreate;
+import app.web.validation.OnUpdate;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Positive;
 import lombok.Builder;
@@ -14,33 +16,32 @@ import java.math.BigDecimal;
 @Builder
 public class BookRequest {
 
-    @NotEmpty(message = "Title is required")
+    @NotEmpty(groups = OnCreate.class, message = "Title is required")
     private String title;
 
-    @NotEmpty(message = "Genre is required")
+    @NotEmpty(groups = OnCreate.class, message = "Genre is required")
     private BookGenre genre;
 
-    @NotEmpty(message = "Type is required")
+    @NotEmpty(groups = OnCreate.class, message = "Type is required")
     private BookType type;
 
-    @NotEmpty(message = "Pages is required")
+    @NotEmpty(groups = OnCreate.class, message = "Pages is required")
     private int pages;
 
-    @NotEmpty(message = "Number of books is required")
+    @NotEmpty(groups = OnCreate.class, message = "Number of books is required")
     private int numOfBooks;
 
-    @Positive
-    @NotEmpty(message = "Price is required")
+    @Positive(groups = {OnCreate.class, OnUpdate.class})
+    @NotEmpty(groups = OnCreate.class, message = "Price is required")
     private BigDecimal price;
 
-    @NotEmpty(message = "Language is required")
+    @NotEmpty(groups = OnCreate.class, message = "Language is required")
     private String language;
 
-    @NotEmpty(message = "Author is required")
+    @NotEmpty(groups = OnCreate.class, message = "Author is required")
     private String authorName;
 
-    @NotEmpty(message = "Cover is required")
-    @URL(message = "Requires correct web link format")
+    @URL(groups = OnUpdate.class, message = "Requires correct web link format")
     private String bookCover;
 
     private boolean inStock;
