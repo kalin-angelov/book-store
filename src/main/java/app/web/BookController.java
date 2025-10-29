@@ -2,12 +2,15 @@ package app.web;
 
 import app.book.model.Book;
 import app.book.service.BookService;
-import app.web.dto.AddBookRequest;
-import app.web.dto.EditBookRequest;
+import app.web.dto.BookRequest;
 import app.web.dto.Response;
+import app.web.validation.OnCreate;
+import app.web.validation.OnUpdate;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,7 +24,7 @@ public class BookController {
     private final BookService bookService;
 
     @PostMapping("/add-book")
-    public ResponseEntity<Response> addNewBook(@RequestBody AddBookRequest request) {
+    public ResponseEntity<Response> addNewBook(@Validated(OnCreate.class) @RequestBody BookRequest request) {
 
         Book book = bookService.addNewBook(request);
 
@@ -32,16 +35,16 @@ public class BookController {
                         .build());
     }
 
-    @PutMapping("/edit-book")
-    public Book editBook(@RequestParam(name = "bookId")UUID bookId, @RequestBody EditBookRequest request) {
+    @PutMapping("/{bookId}/edit-book")
+    public Book editBook(@PathVariable UUID bookId,@Validated(OnUpdate.class)  @RequestBody BookRequest request) {
 
         Book book = bookService.editBook(bookId, request);
 
         return book;
     }
 
-    @GetMapping
-    public Book getBookDetails(@RequestParam(name = "bookId") UUID bookId) {
+    @GetMapping("/{bookId}")
+    public Book getBookDetails(@PathVariable UUID bookId) {
 
         return bookService.getBookById(bookId);
     }
