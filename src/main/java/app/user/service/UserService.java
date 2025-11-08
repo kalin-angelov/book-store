@@ -5,8 +5,10 @@ import app.exeptions.PasswordException;
 import app.exeptions.UserException;
 import app.jwt.JwtService;
 import app.token.service.TokenService;
+import app.loginRateLimiter.model.LoginRateLimiter;
 import app.user.model.User;
 import app.user.model.UserRole;
+import app.loginRateLimiter.repository.LoginLimiterRepo;
 import app.user.repository.UserRepository;
 import app.web.dto.ChangePasswordRequest;
 import app.web.dto.EditUserRequest;
@@ -35,6 +37,7 @@ public class UserService {
     private final TokenService tokenService;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final LoginLimiterRepo loginLimiterRepo;
 
     @Transactional
     public String registerUser(RegisterRequest request) {
@@ -68,7 +71,7 @@ public class UserService {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
             User user = userRepository.findUserByEmail(loginRequest.getEmail())
-                    .orElseThrow(() -> new UsernameNotFoundException("User with the provided email [%s] is found.".formatted(loginRequest.getEmail())));
+                    .orElseThrow(() -> new UsernameNotFoundException("User with the provided email [%s] is not found.".formatted(loginRequest.getEmail())));
             String token = jwtService.generateToken(user.getEmail());
 
             tokenService.revokedAllUserTokens(user);
@@ -138,5 +141,30 @@ public class UserService {
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
+    }
+
+    private LoginRateLimiter upsertFailLoginAttempts(User user) {
+
+        Optional<LoginRateLimiter> optionalLoginRateLimiter = loginLimiterRepo.findByUser(user);
+
+        if (optionalLoginRateLimiter.isPresent()) {
+            LoginRateLimiter loginRateLimiter = optionalLoginRateLimiter.get();
+            int attempts = loginRateLimiter.getAttempts() + 1;
+            loginRateLimiter.setAttempts(attempts);
+
+            if (attempts == 5) {
+                loginRateLimiter.setLimitExpiredAt(LocalDateTime.now().plusMinutes(10));
+            }
+
+            loginLimiterRepo.save(loginRateLimiter);
+            return loginRateLimiter;
+        }
+
+        LoginRateLimiter loginRateLimiter = LoginRateLimiter.builder()
+                .user(user)
+                .attempts(1)
+                .build();
+        loginLimiterRepo.save(loginRateLimiter);
+        return loginRateLimiter;
     }
 }
